@@ -1,5 +1,7 @@
 
-import pygame
+import skimage.draw
+import skimage.filters
+from scipy.ndimage.filters import convolve
 import logging
 import numpy as np
 log = logging.getLogger(__name__)
@@ -22,27 +24,40 @@ def node_positions(n, radius, center):
 def draw_sequence(screen, sequence, n, thread_color = BLACK):
     """ plots a sequence into a image array"""
 
-    size = np.array(screen.get_size())
+    size = np.array(screen.shape[:2])
 
 
     center = size/2.0
     radius = np.min(size)/2
 
     # render canvas
-    pygame.draw.circle(screen, BLUE, np.floor(center).astype(int), np.floor(radius).astype(int), 1)
+    center_int = np.floor(center).astype(int)
+    rr, cc, val = skimage.draw.circle_perimeter_aa(center_int[0], center_int[1] ,np.floor(radius).astype(int)-1)
+    screen[rr, cc, :] = val[:,None] * 255
+    #pygame.draw.circle(screen, BLUE, np.floor(center).astype(int), np.floor(radius).astype(int), 1)
     ni = node_positions(n, radius, center)
+    ni[:,0] = np.clip(ni[:,0], 0, size[0]-1)
+    ni[:,1] = np.clip(ni[:,1], 0, size[1]-1)
 
     # render nails
     for i in range(n):
-        pygame.draw.circle(screen, GREEN, ni[i,:], 3, 0)
+        rr, cc = skimage.draw.circle(ni[i,0], ni[i,1], 3)
+        rr = np.clip(rr,0,screen.shape[0]-1)
+        cc = np.clip(cc,0,screen.shape[1]-1)
+        screen[rr, cc, :] = np.array([0, 255, 0])
 
+    # draw edges
+    for i in range(1,len(sequence)):
+        rr, cc, val = skimage.draw.line_aa(ni[sequence[i-1],0], ni[sequence[i-1],1],
+                                           ni[sequence[i],0], ni[sequence[i],1])
+        #val = (255*val).astype(np.uint8)
+        screen[rr, cc, :] = (screen[rr, cc, :]-(val[:,None]*0.4*255).astype(np.uint8)).clip(0,255)
+            #np.maximum(np.minimum(screen[rr, cc, :]-20,100)*(1-val[:,None]),0)#(screen[rr, cc, :]*(1-val[:,None])).clip(0,255).astype(np.uint8)
+    # pygame.draw.aalines(screen, thread_color, False, ni[sequence,:], 1)
+    #skimage.filters.gaussian(screen,sigma=10)
 
-    # choose some edges
-    #sequence = np.random.random_integers(0,n,100)
-
-    pygame.draw.aalines(screen, thread_color, False, ni[sequence,:], 1)
-
-def show():
+def pygame_show():
+    import pygame
     pygame.display.flip()
 
     while True:
@@ -50,48 +65,3 @@ def show():
         if event.type == pygame.KEYDOWN or event.type == pygame.QUIT:
             pygame.quit()
             break
-
-
-if __name__ == '__main__':
-    from src.data.load_image import prepare_image
-    from src.features.manipulate_array import extract_canvas_circle
-    from src.models.loss import p1, p2
-    from src.models.greedy import next_step
-    import logging
-
-    logging.basicConfig(level=logging.INFO)
-
-
-    img = prepare_image("../../data/raw/Walter_Huber_WHU_kopf.jpg")
-
-    size = img.get_size()
-    size = np.array(size)
-    N=128
-    thread_color = BLACK#(np.array(WHITE)*0.8).astype(int)
-
-    nodes = node_positions(N, np.min(size)/2, size/2)
-
-    screen = pygame.display.set_mode(size)
-
-    state = screen.copy()
-    state.fill(WHITE)
-
-    screen.blit(img, [0,0])
-    extract_canvas_circle(screen)
-
-    target_value = p2(state, screen)
-    node = np.random.randint(0,N-1)
-    sequence = []
-
-    while node is not None:
-        sequence.append(node)
-        node, target_value = next_step(state, node, target_value, screen, nodes, p2, thread_color=thread_color)
-
-    log.info("found: {}".format(sequence))
-
-    draw_sequence(screen, sequence, N, thread_color=thread_color)
-
-    pygame.display.set_caption("Example code for the draw module")
-    show()
-
-#    draw_sequence(screen, np.random.random_integers(0,127,100),128)

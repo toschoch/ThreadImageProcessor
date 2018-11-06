@@ -1,13 +1,8 @@
 import numpy as np
-import pygame
 
 def p1(state, target):
-    state = pygame.surfarray.pixels3d(state)
-    target = pygame.surfarray.pixels3d(target)
-    return np.sum(np.abs(state-target))
+    return np.abs((state[:,:,0].astype(np.int64)-target[:,:,0].astype(np.int64))).sum()
 
 def p2(state, target):
-    state = pygame.surfarray.pixels3d(state)
-    target = pygame.surfarray.pixels3d(target)
     return np.sum((state-target)**2)
 

@@ -1,12 +1,11 @@
-import pygame
 import numpy as np
 
-def extract_canvas_circle(screen):
+def extract_canvas_circle(arr):
 
-    arr = pygame.surfarray.pixels3d(screen)
+    #arr = pygame.surfarray.pixels3d(screen)
 
     # largest inscribed circle
-    size = screen.get_size()
+    size = arr.shape[:2]
     n = np.min(size)
 
     x = ((np.arange(size[0])-size[0]/2.)*2./n)[:,None]

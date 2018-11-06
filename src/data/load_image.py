@@ -1,5 +1,5 @@
+import PIL
 from PIL import Image, ImageEnhance
-import pygame
 import numpy as np
 
 def prepare_image(filename):
@@ -18,9 +18,12 @@ def prepare_image(filename):
     cr2 = np.ceil(c+n/2.).astype(int)
 
     image = image.crop(cr1.tolist()+cr2.tolist())
-    return to_pygame_image(image)
+    return image
+
+
 
 def to_pygame_image(image):
+    import pygame
     size = image.size
 
     mode = image.mode
