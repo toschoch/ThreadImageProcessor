@@ -1,4 +1,4 @@
-import PIL
+
 from PIL import Image, ImageEnhance
 import numpy as np
 
@@ -19,7 +19,6 @@ def prepare_image(filename):
     cr2 = np.ceil(c+n/2.).astype(int)
 
     image = image.crop(cr1.tolist()+cr2.tolist())
-    image = image.resize((400, 400), Image.ANTIALIAS)
     return image
 
 

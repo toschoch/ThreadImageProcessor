@@ -16,6 +16,9 @@ from src.models.greedy import next_step
 import logging
 import skimage.io
 import msvcrt
+import json
+import pathlib
+from PIL import Image
 
 import numpy as np
 
@@ -25,14 +28,21 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)
 
-    img = prepare_image("data/raw/Philipp_Huber_PHU_medium.jpg")
+
+    filename = "data/raw/Tobias_Schoch_TOS_kopf_big_2.jpg"
+
+    input_file = pathlib.Path(filename)
+
+    img = prepare_image(filename)
+
+    img = img.resize((400, 400), Image.ANTIALIAS)
     img = pil_to_ndarray(img)
 
     print(skimage.io.available_plugins)
 
     size = img.shape[:2]
     size = np.array(size)
-    N = 128
+    N = 256
     thread_color = 0.2
 
     nodes = node_positions(N, np.min(size) / 2, size / 2)
@@ -58,17 +68,29 @@ if __name__ == '__main__':
             key = msvcrt.getch()
             if key == b'q':
                 break
-
-
-    #sequence = np.random.random_integers(0,N-1,50)
+        print(json.dumps({'progress':int(target_value), 'nodes':len(sequence)}))
     log.info("found: {}".format(sequence))
-    #
-    #img[:] = 255
-    #draw_sequence(img, sequence, N, thread_color=thread_color)
+
+    # store sequence
+    model_file = pathlib.Path('models/').joinpath(input_file.name).with_suffix('.py')
+    with open(model_file,'w+') as fp:
+        fp.write("sequence = {}\n".format(sequence))
+        fp.write("N = {}\n".format(N))
+
+    # from models.philipp import sequence
+    # draw_sequence(state, sequence, N, thread_color=thread_color)
+
+    title = "{}\n{} nodes, {} edges".format(input_file.name, N, len(sequence))
+
+    viewer2 = ImageViewer(state)
+    viewer2.ax.set_title(title)
+    viewer2.fig.savefig(pathlib.Path('data/processed/').joinpath(input_file.name).with_suffix('.png'))
+    viewer2.fig.tight_layout()
+
+    viewer2.show()
+
 
     viewer = ImageViewer(img)
-    viewer2 = ImageViewer(state)
-    viewer2.show()
     viewer.show()
 
 
