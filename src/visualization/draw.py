@@ -1,7 +1,7 @@
 
 import skimage.draw
 import skimage.filters
-from scipy.ndimage.filters import convolve
+
 import logging
 import numpy as np
 log = logging.getLogger(__name__)
@@ -21,7 +21,9 @@ def node_positions(n, radius, center):
 
     return ni
 
-def draw_sequence(screen, sequence, n, thread_color = BLACK):
+
+
+def draw_sequence(screen, sequence, n, thread_color):
     """ plots a sequence into a image array"""
 
     size = np.array(screen.shape[:2])
@@ -34,7 +36,7 @@ def draw_sequence(screen, sequence, n, thread_color = BLACK):
     center_int = np.floor(center).astype(int)
     rr, cc, val = skimage.draw.circle_perimeter_aa(center_int[0], center_int[1] ,np.floor(radius).astype(int)-1)
     screen[rr, cc, :] = val[:,None] * 255
-    #pygame.draw.circle(screen, BLUE, np.floor(center).astype(int), np.floor(radius).astype(int), 1)
+
     ni = node_positions(n, radius, center)
     ni[:,0] = np.clip(ni[:,0], 0, size[0]-1)
     ni[:,1] = np.clip(ni[:,1], 0, size[1]-1)
@@ -48,13 +50,19 @@ def draw_sequence(screen, sequence, n, thread_color = BLACK):
 
     # draw edges
     for i in range(1,len(sequence)):
-        rr, cc, val = skimage.draw.line_aa(ni[sequence[i-1],0], ni[sequence[i-1],1],
-                                           ni[sequence[i],0], ni[sequence[i],1])
-        #val = (255*val).astype(np.uint8)
-        screen[rr, cc, :] = (screen[rr, cc, :]-(val[:,None]*0.4*255).astype(np.uint8)).clip(0,255)
-            #np.maximum(np.minimum(screen[rr, cc, :]-20,100)*(1-val[:,None]),0)#(screen[rr, cc, :]*(1-val[:,None])).clip(0,255).astype(np.uint8)
-    # pygame.draw.aalines(screen, thread_color, False, ni[sequence,:], 1)
-    #skimage.filters.gaussian(screen,sigma=10)
+        draw_edge(screen, sequence[i-1], sequence[i], ni, thread_color)
+
+
+
+def draw_edge(image, i, j, nodes, intensity):
+    rr, cc, val = skimage.draw.line_aa(nodes[i, 0], nodes[i, 1],
+                                       nodes[j, 0], nodes[j, 1])
+
+    image[rr, cc, :] = (image[rr, cc, :].astype(float) - val[:, None] * intensity * 255.).clip(0, 255).astype(np.uint8)
+
+
+
+
 
 def pygame_show():
     import pygame

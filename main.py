@@ -15,6 +15,7 @@ from src.models.greedy import next_step
 
 import logging
 import skimage.io
+import msvcrt
 
 import numpy as np
 
@@ -22,9 +23,9 @@ log = logging.getLogger(__name__)
 
 if __name__ == '__main__':
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
-    img = prepare_image("../data/raw/Walter_Huber_WHU_kopf.jpg")
+    img = prepare_image("data/raw/Philipp_Huber_PHU_medium.jpg")
     img = pil_to_ndarray(img)
 
     print(skimage.io.available_plugins)
@@ -48,9 +49,16 @@ if __name__ == '__main__':
     node = np.random.randint(0,N-1)
     sequence = []
 
+    i = 0
     while node is not None:
         sequence.append(node)
+        i += 1
         node, target_value = next_step(state, node, target_value, img, nodes, p1, thread_color=thread_color)
+        if msvcrt.kbhit():
+            key = msvcrt.getch()
+            if key == b'q':
+                break
+
 
     #sequence = np.random.random_integers(0,N-1,50)
     log.info("found: {}".format(sequence))

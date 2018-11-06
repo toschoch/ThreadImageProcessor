@@ -7,6 +7,7 @@ def prepare_image(filename):
     image = Image.open(filename)
 
     image = ImageEnhance.Contrast(image).enhance(2.0)
+    image = ImageEnhance.Brightness(image).enhance(0.9)
 
     image = image.convert('LA').convert('RGB')
 
@@ -18,6 +19,7 @@ def prepare_image(filename):
     cr2 = np.ceil(c+n/2.).astype(int)
 
     image = image.crop(cr1.tolist()+cr2.tolist())
+    image = image.resize((400, 400), Image.ANTIALIAS)
     return image
 
 

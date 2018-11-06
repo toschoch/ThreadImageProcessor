@@ -1,6 +1,7 @@
 import skimage
 import logging
 import numpy as np
+from src.visualization.draw import draw_edge
 
 log = logging.getLogger(__name__)
 
@@ -14,9 +15,7 @@ def next_step(state, current_node, target_value, target, nodes, loss, thread_col
         if i != current_node:
             log.debug("try edge to node: {}".format(i))
             candidate = state.copy()
-            rr, cc, val = skimage.draw.line_aa(nodes[current_node, 0], nodes[current_node, 1],
-                                               nodes[i, 0], nodes[i, 1])
-            candidate[rr, cc, :] = (candidate[rr, cc, :] - (val[:, None] * thread_color * 255).astype(np.uint8)).clip(0, 255)
+            draw_edge(candidate, current_node, i, nodes, thread_color)
 
             candidate_value = loss(candidate, target)
             log.debug("candidate target: {}".format(candidate_value))
@@ -29,9 +28,7 @@ def next_step(state, current_node, target_value, target, nodes, loss, thread_col
         log.debug("no improvement possible through adding a edge")
         return next_node, target_value
 
-    rr, cc, val = skimage.draw.line_aa(nodes[current_node, 0], nodes[current_node, 1],
-                                       nodes[i, 0], nodes[i, 1])
-    state[rr, cc, :] = (state[rr, cc, :] - (val[:, None] * 0.4 * 255).astype(np.uint8)).clip(0, 255)
+    draw_edge(state, current_node, next_node, nodes, thread_color)
     log.info("best next node: {} with target: {}, delta: {}".format(next_node, target_value, delta))
 
     return next_node, target_value
