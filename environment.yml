@@ -20,7 +20,7 @@ dependencies:
   - ipywidgets=7.4.2=py_0
   - jedi=0.13.1=py36_1000
   - jinja2=2.10=py_1
-  - jpeg=9b=vc14_2
+  - jpeg=9c=hfa6e2cd_1001
   - jsonschema=2.6.0=py36_1002
   - jupyter=1.0.0=py_1
   - jupyter_client=5.2.3=py_1
@@ -29,6 +29,7 @@ dependencies:
   - kiwisolver=1.0.1=py36he980bc4_1002
   - libpng=1.6.34=vc14_0
   - libsodium=1.0.16=vc14_0
+  - libtiff=4.0.9=vc14_0
   - markupsafe=1.0=py36hfa6e2cd_1001
   - matplotlib=3.0.1=h8a2030e_1001
   - matplotlib-base=3.0.1=py36h0497f0e_1001
@@ -38,13 +39,15 @@ dependencies:
   - nbconvert=5.3.1=py_1
   - nbformat=4.4.0=py_1
   - notebook=5.7.0=py36_1000
-  - openssl=1.0.2o=vc14_0
+  - olefile=0.46=py_0
+  - openssl=1.0.2p=hfa6e2cd_1001
   - pandas=0.23.4=py36h830ac7b_1000
   - pandoc=2.3.1=0
   - pandocfilters=1.4.2=py_1
   - parso=0.3.1=py_0
   - patsy=0.5.1=py_0
   - pickleshare=0.7.5=py36_1000
+  - pillow=5.3.0=py36h9a613e6_1000
   - pip=18.1=py36_1000
   - prometheus_client=0.4.2=py_0
   - prompt_toolkit=2.0.6=py_0
@@ -68,6 +71,7 @@ dependencies:
   - statsmodels=0.9.0=py36hfa6e2cd_1000
   - terminado=0.8.1=py36_1001
   - testpath=0.4.2=py36_1000
+  - tk=8.6.8=vc14_0
   - tornado=5.1.1=py36hfa6e2cd_1000
   - traitlets=4.3.2=py36_1000
   - vc=14=0
